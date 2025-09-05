@@ -18,5 +18,3 @@ Docker is not suports Enterprise level Standards.
 - Not Enterprise standards.
 
 > Kubernetes solves all this problems.
-
-
