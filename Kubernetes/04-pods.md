@@ -26,7 +26,7 @@ A Pod is the smallest deployable unit in Kubernetes. it basically a wrapper that
 
 ### Steps to create pod 
 
-* run `minikube start --memory=2048 --drive=kvm2` (this drive is for linux).
+* run `minikube start --memory=2048 --driver=kvm2` (this drive is for linux).
 * run `kubectl get nodes` -> will show all running nodes
 * create **name.yaml** file with 
   ```yaml
