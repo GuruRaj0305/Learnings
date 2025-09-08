@@ -17,3 +17,13 @@
 + `cat /proc/meminfo` -> detailed memory usage breakdown.
 
 # Log Monitoring
+All logs is logged here untill the application specifies any external directory.
+
+**The directory => `/var/log/`**
+
+### some of the important log files are : 
++ boot -> to see all the boot related logs.
++ cron -> to see all the cron jobs exicuted details log.( when and which job exicuted )
++ maillog -> All mail related logs here 
++ securelog -> all user login logout related log is generated here.( when ever user logins, logouts and incorrect password etc. )
++ > messages -> this is important log where it stores what ever machine related log is stored here ( all the hardware info logs, software info logs, all the application info logs, processes ingo logs )
