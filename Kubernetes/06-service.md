@@ -58,4 +58,10 @@ spec:
 + `kubectl apply -f auth-Deployment.yaml` -> Create Deployment.
 + `kubectl get deploy ` -> check this is running with all the instances.
 + for now wou can access that pods using `minikube ssh`.
-+ 
++ Then create .yaml file for service.  ( by serching example of type of service which you are implementing )
++ Then From `<deploy>.yaml` file copy the **label form template section** incliding `app: some name`, and add in service file in `selector` section.
++ `nodeport` -> what ever port you want, `targetport` -> the port on which our application is running.
++ `kubectl apply -f auth-service.yaml` -> create service.
++ verify using `kubectl get svc`
++ Then you can access the application by minikube ip address (get by `minikube ip`) or cloud service provider ip adderss.
++ request using ip address : port which shows on service port ( which given by node port ) [`http://10.111.64.121:30007/`]
