@@ -57,4 +57,5 @@ spec:
 + Create Deployment yaml file using example.
 + `kubectl apply -f auth-Deployment.yaml` -> Create Deployment.
 + `kubectl get deploy ` -> check this is running with all the instances.
++ for now wou can access that pods using `minikube ssh`.
 + 

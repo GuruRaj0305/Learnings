@@ -42,4 +42,8 @@ A Pod is the smallest deployable unit in Kubernetes. it basically a wrapper that
             - containerPort: 80
 
   ``` 
-* `kubectl create -f name.yaml`
+* `kubectl create -f name.yaml` -> to create pods
+* `kubectl get pods` -> to get all running pods
+* `kubectl get pods -o wide` -> to get all the pods with ip address.
+* `kubectl get pods <pod name >` -> to get specific pod.
+* `kubectl delete pods <pod name >` -> to delete the pod.
