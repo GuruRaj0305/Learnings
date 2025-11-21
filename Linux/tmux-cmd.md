@@ -49,6 +49,7 @@ sudo apt install tmux -y
 | `Ctrl+b p` | Move to the previous window |
 | `Ctrl+b ,` | Rename the current window |
 | `Ctrl+b &` | Kill the current window |
+| `Ctrl+b !` | convert Splitted window into seperate window |
 
 ### Pane Management
 

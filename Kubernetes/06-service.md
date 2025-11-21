@@ -53,11 +53,12 @@ spec:
 # Steps to Setup complete application 
 
 + Start minikube (in local machine) or KOps (in cloud service provider) 
++ for minikube - (**Point your shell to Minikube’s Docker** -> `Point your shell to Minikube’s Docker`)
 + Build the docker image which you want to run.
 + Create Deployment yaml file using example.
 + `kubectl apply -f auth-Deployment.yaml` -> Create Deployment.
 + `kubectl get deploy ` -> check this is running with all the instances.
-+ for now wou can access that pods using `minikube ssh`.
++ for now you can access that pods using `minikube ssh`.
 + Then create .yaml file for service.  ( by serching example of type of service which you are implementing )
 + Then From `<deploy>.yaml` file copy the **label form template section** incliding `app: some name`, and add in service file in `selector` section.
 + `nodeport` -> what ever port you want, `targetport` -> the port on which our application is running.
