@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Services
 
 A **Service** in Kubernetes is an **abstraction that defines a logical set of Pods** and a **policy to access them**.  
@@ -135,4 +134,4 @@ spec:
 + verify using `kubectl get svc`
 + Then you can access the application by minikube ip address (get by `minikube ip`) or cloud service provider ip adderss.
 + request using ip address : port which shows on service port ( which given by node port ) [`http://10.111.64.121:30007/`]
->>>>>>> faa6ee5 (SQL)
+
