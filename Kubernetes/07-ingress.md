@@ -5,7 +5,7 @@ Ingress exposes HTTP and HTTPS routes from outside the cluster to services with 
 
 Ingress has two parts:
 
-1. Ingress controller
+1. Ingress resource
     YAML file that defines:
     + Domain
     + Path
