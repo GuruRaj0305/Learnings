@@ -1,3 +1,43 @@
+# AWS SAA-C03 – Study Notes Index
+
+> Course by Stéphane Maarek.  
+> Each section has its own file in the folder listed below.
+
+## Sections
+
+| # | Topic | Folder / File |
+|---|-------|---------------|
+| 1 | Getting Started with AWS + IAM | [getting-started/getting-started.md](getting-started/getting-started.md) |
+| 2 | Amazon EC2 – Basics | [ec2/01-ec2-basics.md](ec2/01-ec2-basics.md) |
+| 3 | Amazon EC2 – Associate | [ec2/02-ec2-associate.md](ec2/02-ec2-associate.md) |
+| 4 | Amazon EC2 – Instance Storage | [ec2/03-ec2-instance-storage.md](ec2/03-ec2-instance-storage.md) |
+| 5 | High Availability & Scalability (ELB + ASG) | [ha-scalability/ha-scalability.md](ha-scalability/ha-scalability.md) |
+| 6 | RDS, Aurora & ElastiCache | [rds/rds-aurora-elasticache.md](rds/rds-aurora-elasticache.md) |
+| 7 | Amazon Route 53 | [route53/route53.md](route53/route53.md) |
+| 8 | Classic Solutions Architecture | [solutions-architecture/classic-solutions.md](solutions-architecture/classic-solutions.md) |
+| 9 | Amazon S3 – Basics | [s3/01-s3-basics.md](s3/01-s3-basics.md) |
+| 10 | Amazon S3 – Advanced | [s3/02-s3-advanced.md](s3/02-s3-advanced.md) |
+| 11 | Amazon S3 – Security | [s3/03-s3-security.md](s3/03-s3-security.md) |
+| 12 | CloudFront & Global Accelerator | [cloudfront/cloudfront.md](cloudfront/cloudfront.md) |
+| 13 | AWS Storage Extras | [storage/storage-extras.md](storage/storage-extras.md) |
+| 14 | AWS Integration & Messaging (SQS, SNS, Kinesis) | [messaging/messaging.md](messaging/messaging.md) |
+| 15 | Containers on AWS | [containers/containers.md](containers/containers.md) |
+| 16 | Serverless Overview | [serverless/01-serverless-overview.md](serverless/01-serverless-overview.md) |
+| 17 | Serverless Architectures | [serverless/02-serverless-architectures.md](serverless/02-serverless-architectures.md) |
+| 18 | Databases in AWS | [databases/databases.md](databases/databases.md) |
+| 19 | Data & Analytics | [analytics/data-analytics.md](analytics/data-analytics.md) |
+| 20 | Machine Learning | [ml/machine-learning.md](ml/machine-learning.md) |
+| 21 | AWS Monitoring, Audit & Performance | [monitoring/monitoring.md](monitoring/monitoring.md) |
+| 22 | Advanced Identity in AWS | [identity/advanced-identity.md](identity/advanced-identity.md) |
+| 23 | AWS Security & Encryption | [security/security-encryption.md](security/security-encryption.md) |
+| 24 | Amazon VPC | [vpc/vpc.md](vpc/vpc.md) |
+| 25 | Disaster Recovery & Migrations | [disaster-recovery/disaster-recovery.md](disaster-recovery/disaster-recovery.md) |
+| 26 | More Solutions Architecture | [more-solutions/more-solutions.md](more-solutions/more-solutions.md) |
+| 27 | AWS Cost Management | [cost-management/cost-explorer.md](cost-management/cost-explorer.md) |
+| 28 | Exam Review & Tips | [exam-prep/exam-review.md](exam-prep/exam-review.md) |
+
+---
+
 # AWS Regions
 
 * It is all around the world.
