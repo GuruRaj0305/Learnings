@@ -1,442 +1,101 @@
 ## Serverless Architectures
 
 
-### Mobile application: MyTodoList
+### Mobile Application: MyTodoList
 
-- We want to create a mobile application with the following requirements
+**Requirements:**
 - Expose as REST API with HTTPS
 - Serverless architecture
 - Users should be able to directly interact with their own folder in S3
 - Users should authenticate through a managed serverless service
-- The users can write and read to-dos, but they mostly read them
-- The database should scale, and have some high read throughput
+- Users can write and read to-dos, but mostly read
+- Database should scale and have high read throughput
 
-### Mobile app: REST API layer
+**Architecture:**
+1. **REST API layer:** Mobile Client → Amazon API Gateway → AWS Lambda → Amazon DynamoDB; authenticated via Amazon Cognito
+2. **Giving users access to S3:** Cognito provides permissions → Users can store/retrieve files in Amazon S3
+3. **High read throughput:** Add DAX caching layer in front of DynamoDB for faster reads
+4. **Caching at API Gateway:** Cache REST API responses at the API Gateway level
 
-REST HTTPS invoke query
-
-AWS Lambda Amazon DynamoDB
-
-Amazon API Gateway
-
-Mobile
-
-client
-
-Verify authentication
-
-authenticate
-
-Amazon Cognito
-
-
-### Mobile app: giving users access to S3
-
-Store/retrieve files
-
-Amazon S3
-
-Permissions
-
-AWS Lambda Amazon DynamoDB
-
-Amazon API Gateway
-
-Mobile
-
-client
-
-authenticate
-
-Amazon Cognito
-
-
-### Mobile app: high read throughput, static data
-
-Store/retrieve files
-
-Amazon S3
-
-Permissions
-
-REST HTTPS invoke Query / read
-
-AWS Lambda
-
-Amazon API Gateway DAX DynamoDB
-
-Mobile
-
-Caching layer
-
-client
-
-Verify authentication
-
-authenticate
-
-Amazon Cognito
-
-
-### Mobile app: caching at the API Gateway
-
-Store/retrieve files
-
-Amazon S3
-
-CACHING OF RESPONSES
-
-Permissions
-
-REST HTTPS invoke Query / read
-
-AWS Lambda
-
-Amazon API Gateway DAX DynamoDB
-
-Mobile
-
-Caching layer
-
-client
-
-Verify authentication
-
-authenticate
-
-Amazon Cognito
-
-
-### In this lecture
-
+**Summary:**
 - Serverless REST API: HTTPS, API Gateway, Lambda, DynamoDB
-- Using Cognito to generate temporary credentials to access S3 bucket
+- Cognito generates temporary credentials to access S3 bucket with restricted policy
+- Caching reads on DynamoDB using DAX
+- Caching REST requests at the API Gateway level
+- Security with Cognito for authentication and authorization
 
-with restricted policy. App users can directly access AWS resources this
+### Serverless Hosted Website: MyBlog.com
 
-way. Pattern can be applied to DynamoDB, Lambda…
-
-- Caching the reads on DynamoDB using DAX
-- Caching the REST requests at the API Gateway level
-- Security for authentication and authorization with Cognito
-
-### Serverless hosted website: MyBlog.com
-
-- This website should scale globally
+**Requirements:**
+- Must scale globally
 - Blogs are rarely written, but often read
-- Some of the website is purely static files, the rest is a dynamic REST API
-- Caching must be implement where possible
-- Any new users that subscribes should receive a welcome email
-- Any photo uploaded to the blog should have a thumbnail generated
-
-### Ser ving static content, globally
-
-Interaction with
-
-edge locations
-
-Amazon S3
-
-Amazon CloudFront
-
-Global distribution
-
-Client
-
-
-### Ser ving static content, globally, securely
-
-OAC: Origin Access Control
-
-Bucket policy
-
-Only authorize from
-
-Interaction with
-
-CloudFront Distribution
-
-edge locations
-
-Amazon S3
-
-Amazon CloudFront
-
-Global distribution
-
-Client
-
-
-### Adding a public ser verless REST API
-
-OAC: Origin Access Control
-
-Bucket policy
-
-Only authorize from
-
-Interaction with
-
-CloudFront Distribution
-
-edge locations
-
-Amazon S3
-
-Amazon CloudFront
-
-Global distribution
-
-REST HTTPS invoke Query / read
-
-AWS Lambda
-
-Amazon API Gateway DAX DynamoDB
-
-Client
-
-Caching layer
-
-
-### Leveraging DynamoDB Global Tables
-
-OAC: Origin Access Control
-
-Bucket policy
-
-Only authorize from
-
-Interaction with
-
-CloudFront Distribution
-
-edge locations
-
-Amazon S3
-
-Amazon CloudFront
-
-Global distribution
-
-REST HTTPS invoke Query / read
-
-AWS Lambda
-
-Amazon API Gateway DAX DynamoDB
-
-Client
-
-Caching layer Global Tables
-
-
-### User Welcome email flow
-
-OAC: Origin Access Control
-
-Bucket policy
-
-Only authorize from
-
-Interaction with
-
-CloudFront Distribution
-
-edge locations
-
-Amazon S3
-
-Amazon CloudFront
-
-Global distribution
-
-REST HTTPS invoke Query / read
-
-AWS Lambda
-
-Amazon API Gateway DAX DynamoDB
-
-Client
-
-Caching layer
-
-Stream changes
-
-IAM Role
-
-SDK to send email
-
-Invoke lambda
-
-Amazon Simple AWS Lambda
-
-DynamoDB
-
-Email Service (SES)
-
-Stream
-
-
-### Thumbnail Generation flow
-
-OAC: Origin Access Control
-
-Bucket policy
-
-Only authorize from
-
-Interaction with
-
-CloudFront Distribution
-
-edge locations
-
-Amazon S3
-
-Amazon CloudFront
-
-Global distribution
-
-REST HTTPS invoke Query / read
-
-AWS Lambda
-
-Amazon API Gateway DAX DynamoDB
-
-Client
-
-Caching layer
-
-optional
-
-Upload photos
-
-Transfer acceleration OAC trigger thumbnail
-
-Amazon CloudFront Amazon S3 AWS Lambda Amazon S3
-
-Global distribution
-
-
-### AWS Hosted Website Summary
-
-- We’ve seen static content being distributed using CloudFront with S3
-- The REST API was serverless, didn’t need Cognito because public
-- We leveraged a Global DynamoDB table to serve the data globally
-- (we could have used Aurora Global Database)
-- We enabled DynamoDB streams to trigger a Lambda function
-- The lambda function had an IAM role which could use SES
-- SES (Simple Email Service) was used to send emails in a serverless way
+- Some website pages are purely static files; the rest is a dynamic REST API
+- Caching must be implemented where possible
+- New users who subscribe should receive a welcome email
+- Photos uploaded should have a thumbnail generated
+
+**Architecture:**
+
+1. **Serving static content globally:**
+   - Amazon S3 + Amazon CloudFront for global distribution
+   - OAC (Origin Access Control) with bucket policy: only authorize requests from the CloudFront Distribution
+
+2. **Adding a public serverless REST API:**
+   - Amazon API Gateway → AWS Lambda → DAX → DynamoDB
+
+3. **Leveraging DynamoDB Global Tables:** DynamoDB Global Tables for low-latency reads in multiple regions
+
+4. **User welcome email flow:**
+   - DynamoDB Streams captures changes → invokes Lambda → Lambda uses SES (Simple Email Service) to send welcome email with an IAM Role
+
+5. **Thumbnail generation flow:**
+   - Upload photos to S3 (with optional Transfer Acceleration via CloudFront)
+   - S3 triggers Lambda function via OAC trigger → Lambda generates thumbnail and stores in another S3 bucket
+
+**Summary:**
+- Static content distributed using CloudFront with S3
+- REST API is serverless; didn’t need Cognito because it’s public
+- Leveraged a Global DynamoDB table to serve data globally (could also use Aurora Global DB)
+- Enabled DynamoDB Streams to trigger a Lambda function
+- Lambda function has IAM role to use SES for sending emails
 - S3 can trigger SQS / SNS / Lambda to notify of events
 
-### Micro Services architecture
+### Microservices Architecture
 
-- We want to switch to a micro service architecture
+- We want to switch to a microservice architecture
 - Many services interact with each other directly using a REST API
-- Each architecture for each micro service may vary in form and shape
-- We want a micro-service architecture so we can have a leaner
+- Each microservice architecture may vary in form and shape
+- Goal: leaner development lifecycle for each service
 
-development lifecycle for each service
+**Microservices Environment:**
+- `service1.example.com` → Amazon Route 53 DNS → Elastic Load Balancing → ECS → DynamoDB
+- `service2.example.com` → Amazon API Gateway → AWS Lambda → ElastiCache
+- `service3.example.com` → Elastic Load Balancing → Amazon EC2 Auto Scaling → Amazon RDS
 
-
-### Micro Services Environment
-
-service1.example.com
-
-DNS Query
-
-Amazon Route 53
-
-Elastic Load Balancing ECS DynamoDB
-
-service2.example.com
-
-HTTPS
-
-Amazon API Gateway AWS Lambda ElastiCache
-
-Users
-
-service3.example.com
-
-Elastic Load Balancing Amazon EC2
-
-Amazon RDS
-
-Auto Scaling
-
-
-### Discussions on Micro Services
-
-- You are free to design each micro-service the way you want
+**Discussion on Microservices:**
+- Free to design each microservice the way you want
 - Synchronous patterns: API Gateway, Load Balancers
 - Asynchronous patterns: SQS, Kinesis, SNS, Lambda triggers (S3)
-- Challenges with micro-services:
-- repeated overhead for creating each new microservice,
-- issues with optimizing server density/utilization
-- complexity of running multiple versions of multiple microservices simultaneously
-- proliferation of client-side code requirements to integrate with many separate services.
-- Some of the challenges are solved by Serverless patterns:
-- API Gateway, Lambda scale automatically and you pay per usage
-- You can easily clone API, reproduce environments
-- Generated client SDK through Swagger integration for the API Gateway
+- **Challenges with microservices:**
+  - Repeated overhead for creating each new microservice
+  - Issues with optimizing server density/utilization
+  - Complexity of running multiple versions simultaneously
+  - Proliferation of client-side code requirements for many separate services
+- **Serverless patterns solve some challenges:**
+  - API Gateway, Lambda scale automatically and you pay per usage
+  - Easily clone API, reproduce environments
+  - Generated client SDK through Swagger integration for API Gateway
 
-### Software updates offloading
+### Software Updates Offloading
 
-- We have an application running on EC2, that distributes software
+**Problem:**
+- Application running on EC2 distributes software updates occasionally
+- When a new software update is out, many requests arrive and content is distributed in mass over the network — very costly
+- Don’t want to change the application; want to optimize cost and CPU
 
-updates once in a while
-
-- When a new software update is out, we get a lot of request and the
-
-content is distributed in mass over the network. It’s very costly
-
-- We don’t want to change our application, but want to optimize our cost
-
-and CPU, how can we do it?
-
-
-### Our application current state
-
-Auto Scaling group
-
-Availability zone 1
-
-Availability zone 1 to 3
-
-Availability zone 2
-
-Amazon Elastic
-
-File System
-
-Availability zone 3
-
-
-### Easy way to fix things!
-
-Auto Scaling group
-
-Availability zone 1
-
-Availability zone 1 to 3
-
-Availability zone 2
-
-Amazon Elastic
-
-Amazon CloudFront File System
-
-Availability zone 3
-
-
-### Why CloudFront?
-
-- No changes to architecture
-- Will cache software update files at the edge
-- Software update files are not dynamic, they’re static (never changing)
-- Our EC2 instances aren’t serverless
-- But CloudFront is, and will scale for us
-- Our ASG will not scale as much, and we’ll save tremendously in EC2
-- We’ll also save in availability, network bandwidth cost, etc
-- Easy way to make an existing application more scalable and cheaper!
-
+**Solution: Add CloudFront in Front of the ASG**
+- CloudFront caches software update files at the edge
+- Software update files are static (never changing)
+- Our EC2/ASG doesn’t need to scale as much → save in EC2 costs
+- Also save in availability, network bandwidth cost
+- No architecture changes required — easy way to make an existing application more scalable and cheaper!

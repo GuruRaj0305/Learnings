@@ -5,16 +5,13 @@
 
 - These solutions architectures are the best part of this course
 - Let’s understand how all the technologies we’ve seen work together
-- This is a section you need to be 100% comfortable with
-- We’ll see the progression of a Solution’s architect mindset through many
+- Sample case studies:
+  - WhatIsTheTime.Com
+  - MyClothes.Com
+  - MyWordPress.Com
+  - Instantiating applications quickly
+  - Elastic Beanstalk
 
-sample case studies:
-
-- WhatIsTheTime.Com
-- MyClothes.Com
-- MyWordPress.Com
-- Instantiating applications quickly
-- Beanstalk
 
 ### Stateless Web App: WhatIsTheTime.com
 
@@ -22,634 +19,112 @@ sample case studies:
 - We don’t need a database
 - We want to start small and can accept downtime
 - We want to fully scale vertically and horizontally, no downtime
-- Let’s go through the Solutions Architect journey for this app
-- Let’s see how we can proceed!
 
-### Stateless web app: What time is it?
+**Evolution of the architecture:**
 
-Star ting simple
+1. **Starting simple:** Single Public EC2 with an Elastic IP
+2. **Scaling vertically:** Upgrade EC2 instance type (downtime while upgrading)
+3. **Scaling horizontally:** Multiple EC2 instances, Route 53 A Record (TTL 1 hour) pointing to public IPs – problem: removing instances causes DNS cache to point to gone IPs
+4. **Add ELB + Health Checks:** Route 53 Alias Record → ELB; EC2 instances in private subnets; restricted Security Group rules; no more stale IPs
+5. **Add Auto Scaling Group:** ASG manages EC2 instances behind ELB; scale in/out automatically
+6. **Make it multi-AZ:** ELB spans multiple AZs; ASG deploys across at least 3 AZs
+7. **Reserve capacity:** Reserve minimum 2 instances (Reserved Instances) for cost savings
 
-Elastic IP Address
 
-What time is it?
-
-5:30 pm!
-
-User
-
-Public EC2
-
-
-### Stateless web app: What time is it?
-
-Scaling ver tically
-
-What time is it?
-
-Elastic IP Address
-
-7:30 pm!
-
-What time is it?
-
-Downtime while upgrading to M5
-
-5:30 pm!
-
-User
-
-What time is it? Public EC2
-
-6:30 pm!
-
-
-### Stateless web app: What time is it?
-
-Scaling horizontally
-
-What time is it?
-
-7:30 pm!
-
-What time is it?
-
-5:30 pm!
-
-User
-
-What time is it?
-
-6:30 pm!
-
-
-### Stateless web app: What time is it?
-
-Scaling horizontally
-
-DNS Query What time is it?
-
-Public EC2 instance,
-
-For api.whatisthetime.com
-
-No Elastic IP
-
-A Record
-
-TTL 1 hour 7:30 pm!
-
-What time is it?
-
-5:30 pm!
-
-What time is it?
-
-6:30 pm!
-
-
-### Stateless web app: What time is it?
-
-Scaling horizontally, adding and removing instances
-
-DNS Query What time is it?
-
-For api.whatisthetime.com
-
-INSTANCE IS GONE!
-
-A Record
-
-TTL 1 hour 7:30 pm!
-
-What time is it?
-
-Public EC2 instance,
-
-No Elastic IP
-
-5:30 pm!
-
-What time is it?
-
-6:30 pm!
-
-
-### Stateless web app: What time is it?
-
-Scaling horizontally, with a load balancer
-
-What time is it?
-
-Availability zone 1 Availability zone 1
-
-Restricted
-
-Security groups rules
-
-DNS Query
-
-ELB +
-
-For api.whatisthetime.com
-
-Health Checks
-
-Alias Record
-
-Private
-
-EC2 instances
-
-
-### Stateless web app: What time is it?
-
-Scaling horizontally, with an auto-scaling group
-
-What time is it?
-
-Availability zone 1 Availability zone 1
-
-Auto Scaling group
-
-DNS Query
-
-ELB +
-
-For api.whatisthetime.com
-
-Health Checks
-
-Alias Record
-
-Private
-
-EC2 instances
-
-
-|  | Availability zone 1 |  |
-| --- | --- | --- |
-|  | Auto Scaling group |  |
-|  | Private EC2 instances |  |
-
-
-### Stateless web app: What time is it?
-
-Making our app multi-AZ
-
-Auto Scaling group
-
-What time is it?
-
-Availability zone 1 to 3 Availability zone 1
-
-Availability zone 2
-
-DNS Query
-
-ELB +
-
-For api.whatisthetime.com
-
-Health Checks
-
-Alias Record
-
-+ Multi AZ
-
-Availability zone 3
-
-
-### Minimum 2 AZ => Let’s reser ve capacity
-
-Auto Scaling group
-
-Availability zone 1 to 3 Availability zone 1
-
-Availability zone 2
-
-DNS Query
-
-ELB +
-
-For api.whatisthetime.com
-
-Health Checks
-
-Alias Record
-
-+ Multi AZ
-
-Minimum capacity
-
-= reserved instances
-
-= cost savings
-
-
-### In this lecture we’ve discussed…
+### What We Learned from WhatIsTheTime.com
 
 - Public vs Private IP and EC2 instances
 - Elastic IP vs Route 53 vs Load Balancers
-- Route 53 TTL, A records and Alias Records
+- Route 53 TTL, A Records and Alias Records
 - Maintaining EC2 instances manually vs Auto Scaling Groups
-- Multi AZ to survive disasters
+- Multi-AZ to survive disasters
 - ELB Health Checks
 - Security Group Rules
-- Reservation of capacity for costing savings when possible
+- Reservation of capacity for cost savings when possible
+
 
 ### Stateful Web App: MyClothes.com
 
-- MyClothes.com allows people to buy clothes online.
+- MyClothes.com allows people to buy clothes online
 - There’s a shopping cart
 - Our website is having hundreds of users at the same time
-- We need to scale, maintain horizontal scalability and keep our web
-
-application as stateless as possible
-
+- We need to scale, maintain horizontal scalability and keep our web application as stateless as possible
 - Users should not lose their shopping cart
 - Users should have their details (address, etc) in a database
-- Let’s see how we can proceed!
 
-### Stateful Web App: MyClothes.com
+**Evolution of the architecture:**
 
-Auto Scaling group
+1. **Basic multi-AZ setup:** ELB → Auto Scaling Group across 3 AZs – problem: shopping cart lives in EC2 memory; different requests hit different instances
+2. **Introduce Stickiness (Session Affinity):** ELB Stickiness routes user to same EC2 instance – problem: if instance fails, cart is lost
+3. **Introduce User Cookies:** Shopping cart content stored in HTTP cookies (stateless HTTP requests) – security risk (cookies can be altered); must be validated; cookies < 4 KB
+4. **Introduce Server Session:** Send `session_id` in cookie; store/retrieve session data from ElastiCache (or DynamoDB); stateless EC2 instances
+5. **Store User Data in Database:** Store address, name, etc. in Amazon RDS
+6. **Scaling Reads:** Add RDS Read Replicas; or Lazy Loading via ElastiCache (cache RDS results)
+7. **Multi-AZ:** ElastiCache Multi-AZ, RDS Multi-AZ for disaster recovery
+8. **Security Groups:** Restrict traffic to ElastiCache from EC2 SG only; restrict traffic to RDS from EC2 SG only; open HTTP/HTTPS to 0.0.0.0/0 only on ELB SG
 
-Availability zone 1
 
-Multi AZ
+### What We Learned from MyClothes.com
 
-Availability zone 2
-
-Availability zone 3
-
-
-### Stateful Web App: MyClothes.com
-
-Introduce Stickiness (Session Affinity)
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Availability zone 2
-
-ELB Stickiness
-
-Availability zone 3
-
-
-### Stateful Web App: MyClothes.com
-
-Introduce User Cookies
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Send shopping cart Stateless
-
-content in Web Cookies HTTP requests are heavier
-
-Availability zone 2
-
-Security risk
-
-(cookies can be altered)
-
-Cookies must be validated
-
-Cookies must be less than 4KB
-
-Availability zone 3
-
-
-### Stateful Web App: MyClothes.com
-
-Introduce Ser ver Session
-
-ElastiCache
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Send session_id in
-
-Web Cookies
-
-Store / retrieve
-
-Availability zone 2
-
-session data
-
-Availability zone 3
-
-Amazon DynamoDB
-
-(alternative)
-
-
-### Stateful Web App: MyClothes.com
-
-Storing User Data in a database
-
-ElastiCache
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Availability zone 2
-
-Store / retrieve user data
-
-(address, name, etc)
-
-Availability zone 3
-
-Amazon RDS
-
-
-### Stateful Web App: MyClothes.com
-
-Scaling Reads
-
-ElastiCache
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Availability zone 2 RDS
-
-Master
-
-(writes)
-
-replication
-
-Availability zone 3
-
-Read Replicas
-
-
-### Stateful Web App: MyClothes.com
-
-Scaling Reads (Alternative) – Lazy Loading
-
-ElastiCache
-
-Auto Scaling group
-
-Availability zone 1 cache
-
-Multi AZ
-
-Read from cache
-
-Availability zone 2
-
-Read/write
-
-Availability zone 3
-
-
-### Stateful Web App: MyClothes.com
-
-Multi AZ – Sur vive disasters
-
-ElastiCache
-
-Multi AZ
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Availability zone 2
-
-Availability zone 3
-
-Multi AZ
-
-
-### Stateful Web App: MyClothes.com
-
-Security Groups
-
-Restrict traffic to ElastiCache
-
-Security group from the
-
-EC2 security group
-
-Auto Scaling group
-
-Availability zone 1 ElastiCache
-
-Multi AZ
-
-Open HTTP / HTTPS
-
-to 0.0.0.0/0
-
-Availability zone 2
-
-Availability zone 3
-
-Restrict traffic to RDS
-
-Restrict traffic to EC2
-
-Security group from the
-
-Security group from the LB
-
-EC2 security group
-
-
-### In this lecture we’ve discussed…
-
-3-tier architectures for web applications
-
+- 3-tier architectures for web applications
 - ELB sticky sessions
-- Web clients for storing cookies and making our web app stateless
-- ElastiCache
-- For storing sessions (alternative: DynamoDB)
-- For caching data from RDS
-- Multi AZ
-- RDS
-- For storing user data
-- Read replicas for scaling reads
-- Multi AZ for disaster recovery
+- Web clients for storing cookies (stateless web app)
+- ElastiCache for storing sessions (alternative: DynamoDB) and caching RDS data
+- RDS for storing user data, Read Replicas for scaling reads, Multi-AZ for disaster recovery
 - Tight Security with security groups referencing each other
+
 
 ### Stateful Web App: MyWordPress.com
 
 - We are trying to create a fully scalable WordPress website
 - We want that website to access and correctly display picture uploads
-- Our user data, and the blog content should be stored in a MySQL database.
-- Let’s see how we can achieve this!
+- Our user data, and the blog content should be stored in a MySQL database
 
-### Stateful Web App: MyWordPress.com
+**Evolution of the architecture:**
 
-RDS layer
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Availability zone 2
-
-Multi AZ
-
-Availability zone 3
+1. **RDS layer:** Multi-AZ RDS for WordPress database
+2. **Aurora Multi-AZ & Read Replicas:** Replace RDS with Aurora MySQL for better scalability and HA
+3. **Storing images with EBS:** Images stored in EBS volume – problem: EBS is tied to one AZ; if traffic hits a different AZ, images not accessible
+4. **Storing images with EFS:** Replace EBS with EFS; EFS is distributed across AZs; all EC2 instances share the same file system
 
 
-### Stateful Web App: MyWordPress.com
+### What We Learned from MyWordPress.com
 
-Scaling with Aurora: Multi AZ & Read Replicas
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Availability zone 2
-
-Aurora MySQL
-
-Multi AZ
-
-Availability zone 3
-
-Read Replicas
+- Aurora Database for easy Multi-AZ and Read-Replicas
+- Storing data in EBS (single instance application – tied to one AZ)
+- vs. Storing data in EFS (distributed application – shared across AZs)
 
 
-### Stateful Web App: MyWordPress.com
+### Instantiating Applications Quickly
 
-Storing images with EBS
+When launching a full stack (EC2, EBS, RDS), it can take time to install applications, insert initial data, configure everything, and launch the application. We can take advantage of the cloud to speed that up:
 
-Multi AZ
-
-Availability zone 1
-
-Send image
-
-Amazon EBS
-
-Volume
-
-
-### Stateful Web App: MyWordPress.com
-
-Storing images with EBS
-
-Availability zone 1
-
-Multi AZ
-
-Amazon EBS
-
-Volume
-
-Send image
-
-Availability zone 2
-
-Amazon EBS
-
-Volume
+- **EC2 Instances:**
+  - **Golden AMI:** Install your applications, OS dependencies etc. beforehand and launch your EC2 instance from the Golden AMI
+  - **Bootstrap using User Data:** For dynamic configuration, use User Data scripts
+  - **Hybrid:** Mix Golden AMI and User Data (Elastic Beanstalk)
+- **RDS Databases:**
+  - Restore from a snapshot: the database will have schemas and data ready!
+- **EBS Volumes:**
+  - Restore from a snapshot: the disk will already be formatted and have data!
 
 
-### Stateful Web App: MyWordPress.com
+### Typical Architecture: Web App 3-Tier
 
-Storing images with EFS
-
-Availability zone 1
-
-Multi AZ
-
-Send image
-
-Availability zone 2
-
-
-### In this lecture we’ve discussed…
-
-- Aurora Database to have easy Multi-AZ and Read-Replicas
-- Storing data in EBS (single instance application)
-- Vs Storing data in EFS (distributed application)
-
-### Instantiating Applications quickly
-
-- When launching a full stack (EC2, EBS, RDS), it can take time to:
-- Install applications
-- Insert initial (or recovery) data
-- Configure everything
-- Launch the application
-- We can take advantage of the cloud to speed that up!
-
-### Instantiating Applications quickly
-
-- EC2 Instances:
-- Use a Golden AMI: Install your applications, OS dependencies etc.. beforehand
-
-and launch your EC2 instance from the Golden AMI
-
-- Bootstrap using User Data: For dynamic configuration, use User Data scripts
-- Hybrid: mix Golden AMI and User Data (Elastic Beanstalk)
-- RDS Databases:
-- Restore from a snapshot: the database will have schemas and data ready!
-- EBS Volumes:
-- Restore from a snapshot: the disk will already be formatted and have data!
-
-### Typical architecture: Web App 3-tier
-
+```
 Route 53
-
-ElastiCache
-
-Auto Scaling group
-
-Availability zone 1
-
-Multi AZ
-
-Store / retrieve
-
-session data
-
-Availability zone 2
-
-+ Cached data
-
-Availability zone 3
-
-Amazon RDS
-
-Read / write data
-
-PUBLIC SUBNET PRIVATE SUBNET DATA SUBNET
+  ↓
+ELB (Multi-AZ)
+  ↓
+Auto Scaling Group (EC2 instances – Private Subnet)
+  ↓                    ↓
+ElastiCache          Amazon RDS
+(Session / Cache)    (Read / Write)
+    PUBLIC SUBNET  |  PRIVATE SUBNET  |  DATA SUBNET
+```
 
 
-### Developer problems on AWS
+### Developer Problems on AWS
 
 - Managing infrastructure
 - Deploying Code
@@ -657,128 +132,60 @@ PUBLIC SUBNET PRIVATE SUBNET DATA SUBNET
 - Scaling concerns
 - Most web apps have the same architecture (ALB + ASG)
 - All the developers want is for their code to run!
-- Possibly, consistently across different applications and environments
+
 
 ### Elastic Beanstalk – Overview
 
-- Elastic Beanstalk is a developer centric view of deploying an application
-
-on AWS
-
-- It uses all the component’s we’ve seen before: EC2, ASG, ELB, RDS, …
-- Managed service
-- Automatically handles capacity provisioning, load balancing, scaling, application
-
-health monitoring, instance configuration, …
-
+- Elastic Beanstalk is a developer-centric view of deploying an application on AWS
+- It uses all the components we’ve seen before: EC2, ASG, ELB, RDS, …
+- Managed service: automatically handles capacity provisioning, load balancing, scaling, application health monitoring, instance configuration, …
 - Just the application code is the responsibility of the developer
 - We still have full control over the configuration
 - Beanstalk is free but you pay for the underlying instances
 
+
 ### Elastic Beanstalk – Components
 
-- Application: collection of Elastic Beanstalk components (environments,
+- **Application:** Collection of Elastic Beanstalk components (environments, versions, configurations, …)
+- **Application Version:** An iteration of your application code
+- **Environment:**
+  - Collection of AWS resources running an application version (only one application version at a time)
+  - Tiers: Web Server Environment Tier & Worker Environment Tier
+  - You can create multiple environments (dev, test, prod, …)
 
-versions, configurations, …)
-
-- Application Version: an iteration of your application code
-- Environment
-- Collection of AWS resources running an application version (only one application
-
-version at a time)
-
-- Tiers: Web Server Environment Tier & Worker Environment Tier
-- You can create multiple environments (dev, test, prod, …)
-
-update version
-
-Create Upload Launch Manage
-
-Application Version Environment Environment
-
-deploy new version
+Workflow: `Create Application → Upload Version → Launch Environment → Manage Environment` (update version → deploy new version)
 
 
-### Elastic Beanstalk – Suppor ted Platforms
+### Elastic Beanstalk – Supported Platforms
 
-- Go • Ruby
-- Java SE • Packer Builder
-- Java with Tomcat • Single Container Docker
-- .NET Core on Linux • Multi-container Docker
-- .NET on Windows Server • Preconfigured Docker
+- Go
+- Java SE
+- Java with Tomcat
+- .NET Core on Linux
+- .NET on Windows Server
 - Node.js
 - PHP
 - Python
-
-### Web Ser ver Tier vs. Worker Tier
-
-Web Environment
-
-Worker Environment
-
-(myapp.us-east-1.elasticbeanstalk.com)
-
-SQS Queue
-
-Availability Zone 1 Availability Zone 2 Availability Zone 1 Availability Zone 2
-
-SQS message SQS message
-
-pull
-
-messages
-
-Security Group Security Group
-
-Auto Scaling group
-
-Auto Scaling group
-
-EC2 Instance EC2 Instance
-
-EC2 Instance EC2 Instance
-
-(Worker) (Worker)
-
-(Web Server) (Web Server)
-
-- Scale based on the number of SQS messages
-- Can push messages to SQS queue from
-
-another Web Server Tier
+- Ruby
+- Packer Builder
+- Single Container Docker
+- Multi-container Docker
+- Preconfigured Docker
 
 
-|  |  |  |  |
-| --- | --- | --- | --- |
-| EC2 Instance (Worker) |  | Auto Scaling group | EC2 Instance (Worker) |
+### Web Server Tier vs. Worker Tier
+
+| Tier | Description |
+| --- | --- |
+| **Web Server Tier** | Handles HTTP/HTTPS requests; EC2 instances behind an ELB; Auto Scaling Group |
+| **Worker Tier** | Processes background jobs from an SQS Queue; EC2 instances (workers) pull from SQS; scales based on number of SQS messages |
+
+- Can push messages to SQS queue from a Web Server Tier to trigger Worker Tier processing
 
 
-| Security Group EC2 Instance (Web Server) | Auto Scaling group | Security Group EC2 Instance (Web Server) |
+### Elastic Beanstalk – Deployment Modes
+
+| Mode | Use Case | Description |
 | --- | --- | --- |
-
-
-### Elastic Beanstalk Deployment Modes
-
-High Availability with Load Balancer
-
-Single Instance
-
-Great for prod
-
-Great for dev
-
-Availability Zone 1 Availability Zone 1 ALB Availability Zone 2
-
-Elastic IP
-
-Auto Scaling Group
-
-EC2 Instance EC2 Instance EC2 Instance
-
-RDS Master RDS Master RDS Standby
-
-
-| Availability Zone 1 EC2 Instance RDS Master |  | Zone 1 |  | Availabi |
-| --- | --- | --- | --- | --- |
-|  | EC2 Instance |  | Auto Scaling Group | EC2 Instance |
-
+| **Single Instance** | Dev/test | Single EC2 with Elastic IP; single RDS instance |
+| **High Availability with Load Balancer** | Production | ALB + Auto Scaling Group across multiple AZs; RDS Multi-AZ |

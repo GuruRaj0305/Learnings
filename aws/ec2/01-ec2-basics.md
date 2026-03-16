@@ -89,14 +89,14 @@ processors:
 * this list will evolve over time, please check the AWS website for the latest information
 
 
-### EC2 Instance Types – Memor y Optimized
+### EC2 Instance Types – Memory Optimized
 
 - Fast performance for workloads that process large data sets in memory
 - Use cases:
-- High performance, relational/non-relational databases
-- Distributed web scale cache stores
-- In-memory databases optimized for BI (business intelligence)
-- Applications performing real-time processing of big unstructured data
+  - High performance, relational/non-relational databases
+  - Distributed web scale cache stores
+  - In-memory databases optimized for BI (business intelligence)
+  - Applications performing real-time processing of big unstructured data
 
 * this list will evolve over time, please check the AWS website for the latest information
 
@@ -150,258 +150,70 @@ Great website: https://instances.vantage.sh
 ### Introduction to Security Groups
 
 - Security Groups are the fundamental of network security in AWS
-- They control how traffic is allowed into or out of our EC2 Instances.
-
-Inbound traffic
-
-Outbound traffic
-
+- They control how traffic is allowed into or out of our EC2 Instances
 - Security groups only contain rules
-- Security groups rules can reference by IP or by security group
-
-ytiruceS
-
-puorG
-
-WWW EC2 Instance
+- Security group rules can reference by IP or by security group
 
 
-| yt p | EC2 Instance |
-| --- | --- |
-| iruceS uorG |  |
+### Security Groups – Deep Dive
 
-
-### Security Groups
-
-Deeper Dive
-
-- Security groups are acting as a “firewall” on EC2 instances
+- Security groups act as a "firewall" on EC2 instances
 - They regulate:
-- Access to Ports
-- Authorised IP ranges – IPv4 and IPv6
-- Control of inbound network (from other to the instance)
-- Control of outbound network (from the instance to other)
+  - Access to Ports
+  - Authorised IP ranges – IPv4 and IPv6
+  - Control of inbound network (from outside to the instance)
+  - Control of outbound network (from the instance to outside)
 
-### Security Groups
-
-Diagram
-
-Your Computer - IP XX.XX.XX.XX
-
-Security Group 1 Port 22 (authorised port 22)
-
-Inbound
-
-Other computer
-
-Filter IP / Port with Rules Port 22
-
-(not authorised port 22)
-
-EC2 Instance
-
-IP XX.XX.XX.XX
-
-Security Group 1
-
-Outbound
-
-Any Port
-
-Any IP – Any Port
-
-Filter IP / Port with Rules
-
-
-|  |  |  |
-| --- | --- | --- |
-|  | Security Group 1 | Port 22 |
-|  | Inbound Filter IP / Port with Rules |  |
-
-
-|  |  | Security Group 1 |
-| --- | --- | --- |
-|  |  | Outbound |
-|  |  | Filter IP / Port with Rules |
-
-
-### Security Groups
-
-Good to know
+### Security Groups – Good to Know
 
 - Can be attached to multiple instances
-- Locked down to a region / VPC combination
-- Does live “outside” the EC2 – if traffic is blocked the EC2 instance won’t see it
-- It’s good to maintain one separate security group for SSH access
-- If your application is not accessible (time out), then it’s a security group issue
-- If your application gives a “connection refused“ error, then it’s an application
-
-error or it’s not launched
-
+- Locked down to a region/VPC combination
+- Lives "outside" the EC2 – if traffic is blocked, the EC2 instance won't see it
+- Good practice: maintain one separate security group for SSH access
+- If your application is not accessible (time out) → security group issue
+- If your application gives a "connection refused" error → application error or not launched
 - All inbound traffic is blocked by default
 - All outbound traffic is authorised by default
 
-### Referencing other security groups
-
-Diagram
-
-Security
-
-EC2 Instance
-
-Port 123 Group 2
-
-IP XX.XX.XX.XX
-
-(attached)
-
-Security Group 1
-
-Security
-
-EC2 Instance Inbound EC2 Instance
-
-Port 123 Group 1
-
-IP XX.XX.XX.XX
-
-Authorising Security Group 1 IP XX.XX.XX.XX
-
-(attached)
-
-Authorising Security Group 2
-
-Security
-
-EC2 Instance
-
-Port 123 Group 3
-
-IP XX.XX.XX.XX
-
-(attached)
-
-
-| Security Group 2 (attached) |  |
-| --- | --- |
-
-
-|  |  |  |
-| --- | --- | --- |
-|  |  | Port 123 |
-|  | Security Group 1 Inbound |  |
-|  |  | Port 123 |
-|  | Authorising Security Group 1 Authorising Security Group 2 |  |
-
-
-| Security Group 1 (attached) |  |
-| --- | --- |
-
-
-| Security Group 3 (attached) |  |
-| --- | --- |
-
-
-### Classic Ports to know
-
-- 22 = SSH (Secure Shell) - log into a Linux instance
-- 21 = FTP (File Transfer Protocol) – upload files into a file share
-- 22 = SFTP (Secure File Transfer Protocol) – upload files using SSH
-- 80 = HTTP – access unsecured websites
-- 443 = HTTPS – access secured websites
-- 3389 = RDP (Remote Desktop Protocol) – log into a Windows instance
-
-### SSH Summary Table
-
-EC2 Instance
-
-SSH Putty
-
-Connect
-
-Linux
-
-Windows < 10
-
-Windows >= 10
-
-
-### Which Lectures to watch
-
-- Mac / Linux:
-- SSH on Mac/Linux lecture
-- Windows:
-- Putty Lecture
-- If Windows 10: SSH on Windows 10 lecture
-- All:
-- EC2 Instance Connect lecture
-
-### SSH troubleshooting
-
-- Students have the most problems with SSH
-- If things don’t work…
-
-1. Re-watch the lecture. You may have missed something
-
-2. Read the troubleshooting guide
-
-3. Try EC2 Instance Connect
-
-- If one method works (SSH, Putty or EC2 Instance Connect) you’re good
-- If no method works, that’s okay, the course won’t use SSH much
-
-### How to SSH into your EC2 Instance
-
-Linux / Mac OS X
-
-- We’ll learn how to SSH into your EC2 instance using Linux / Mac
-- SSH is one of the most important function. It allows you to control a
-
-remote machine, all using the command line.
-
-EC2 Instance
-
-Linux
-
-Public IP
-
-- We will see how we can configure OpenSSH ~/.ssh/config to facilitate
-
-the SSH into our EC2 instances
-
-Port
-
-
-### How to SSH into your EC2 Instance
-
-Windows
-
-- We’ll learn how to SSH into your EC2 instance using Windows
-- SSH is one of the most important function. It allows you to control a
-
-remote machine, all using the command line.
-
-EC2 Instance
-
-Linux
-
-Public IP
-
-- We will configure all the required parameters necessary for doing SSH
-
-on Windows using the free tool Putty.
-
-Port
-
+### Referencing Other Security Groups
+
+- Security groups can reference each other by name (not just by IP)
+- Useful for allowing instances to communicate securely without hardcoding IPs
+- Example: Allow Security Group A to access instances in Security Group B on port 123
+
+### Classic Ports to Know
+
+| Port | Protocol | Description |
+|------|----------|-------------|
+| 22 | SSH (Secure Shell) | Log into a Linux instance |
+| 21 | FTP (File Transfer Protocol) | Upload files into a file share |
+| 22 | SFTP (Secure File Transfer Protocol) | Upload files using SSH |
+| 80 | HTTP | Access unsecured websites |
+| 443 | HTTPS | Access secured websites |
+| 3389 | RDP (Remote Desktop Protocol) | Log into a Windows instance |
+
+### SSH Summary
+
+| Method | Platform |
+|--------|----------|
+| SSH | Linux / Mac / Windows 10+ |
+| PuTTY | Windows < 10 |
+| EC2 Instance Connect | All (browser-based, no key file needed) |
+
+### SSH Troubleshooting
+
+1. Verify the security group has port 22 open for your IP
+2. Make sure you're using the correct key pair (.pem file)
+3. Try EC2 Instance Connect as an alternative
+4. Connection **timeout** = security group issue; connection **refused** = application issue
 
 ### EC2 Instance Connect
 
 - Connect to your EC2 instance within your browser
-- No need to use your key file that was downloaded
-- The “magic” is that a temporary key is uploaded onto EC2 by AWS
-- Works only out-of-the-box with Amazon Linux 2
-- Need to make sure the port 22 is still opened!
-
+- No need to use your downloaded key file
+- AWS uploads a temporary key to the instance automatically
+- Works out-of-the-box with Amazon Linux 2
+- Port 22 must still be open in the security group
 ### EC2 Instances Purchasing Options
 
 - On-Demand Instances – short workload, predictable pricing, pay by second
